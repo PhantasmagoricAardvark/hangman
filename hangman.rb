@@ -12,28 +12,27 @@ class Board
 
 	def create_board
 		(@@secret_word.length).times do |e|
-			@@board += "_ "
+			@@board += "_"
 		end
 	end	
 
-	def display_board
-		@@board
+	def self.display_board
+		if board.kind_of?(Array)
+		board = @@board.split("").each { |e| e << " " }
+		puts "Current: #{board.join(" ")}"
 	end
 
 	def self.modify_board(guess)
-		p @@board
-		p @@secret_word.index(guess)
-		if @@secret_word.index(guess) == 0
-			index1 = 0
-		elsif @@secret_word.index(guess).odd?
-			index1 = @@secret_word.index(guess) + 1
-		elsif @@secret_word.index(guess).even?
-			index1 = @@secret_word.index(guess) * 2
-		end
-		p index1
-		@@board.sub!(@@board[index1], guess)
-		p @@board
-
+		puts 
+		@@secret_word_arr = @@secret_word.split("")
+		@@board_arr = @@board.split("")
+		p @@secret_word_arr
+		p @@board_arr
+		index1 = @@secret_word_arr.index(guess)
+		@@board_arr.insert(index1,guess)
+		@@board_arr.delete_at(index1 + 1)
+		p @@board_arr
+		@@board = @@board_arr		
 	end	
 
 	def self.check_player_guess(guess)
@@ -59,3 +58,4 @@ player = Player.new
 p board.choose_word
 board.create_board
 player.guess_letter
+Board.display_board
