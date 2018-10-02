@@ -1,5 +1,3 @@
-
-
 class Board
 	@@board = ""
 	@@secret_word = ""
@@ -7,7 +5,7 @@ class Board
 		lines = File.readlines("5desk.txt")
 		new_lines = lines.map { |e| e.chomp }
 		new_lines.select! {|e| e.length >= 5 && e.length <= 12}
-		@@secret_word = new_lines.sample.downcase
+		@@secret_word = new_lines[2]
 	end
 
 	def create_board
@@ -17,22 +15,39 @@ class Board
 	end	
 
 	def self.display_board
-		if board.kind_of?(Array)
-		board = @@board.split("").each { |e| e << " " }
-		puts "Current: #{board.join(" ")}"
+		if @@board.kind_of?(String)
+			board = @@board.split("").join(" ") 
+			puts "current board: #{board}"
+		elsif @@board.kind_of?(Array)
+			board = @@board.join(" ")
+			puts "current board: #{board}"
+		end
 	end
 
 	def self.modify_board(guess)
-		puts 
+		puts
+		i = 0 
+		guesses = []
 		@@secret_word_arr = @@secret_word.split("")
-		@@board_arr = @@board.split("")
+		if @@board.kind_of?(String) 
+			@@board_arr = @@board.split("")
+		else
+			@@board_arr = @@board
+		end
 		p @@secret_word_arr
-		p @@board_arr
-		index1 = @@secret_word_arr.index(guess)
-		@@board_arr.insert(index1,guess)
-		@@board_arr.delete_at(index1 + 1)
-		p @@board_arr
-		@@board = @@board_arr		
+		while i < @@secret_word_arr.length
+			if @@secret_word_arr[i] == guess
+				guesses << i
+			end
+			i += 1
+		end
+
+		guesses.each{ |e| 
+			@@board_arr.insert(e,guess)
+			@@board_arr.delete_at(e + 1)
+		} 
+		@@board = @@board_arr	
+	
 	end	
 
 	def self.check_player_guess(guess)
@@ -57,5 +72,8 @@ player = Player.new
 
 p board.choose_word
 board.create_board
+Board.display_board
+player.guess_letter
+Board.display_board
 player.guess_letter
 Board.display_board
