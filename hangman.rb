@@ -1,3 +1,5 @@
+require "yaml"
+
 class Board
 	@@board = ""
 	@@secret_word = ""
@@ -71,8 +73,16 @@ class Board
 		end
 	end
 
-	def secret_word
+	def self.secret_word
 		@@secret_word
+	end
+
+	def self.board
+		@@board
+	end
+
+	def self.incorrect_guesses
+		@@incorrect_guesses
 	end
 end
 
@@ -98,6 +108,14 @@ class Moderator
 		while i > 0
 			puts 
 			puts "Turn #{i}"
+			puts "guess or save? g/s"
+			choice = gets.chomp.downcase
+			if choice == "s"
+				puts "name the file."
+				file_name = gets.chomp.downcase
+				File.open("#{file_name}.yaml", "w") { |file|  
+					file.puts(Moderator.to_yaml(i))}
+			end
 			Board.display_board
 			player.guess_letter
 			if board.check_victory
@@ -110,6 +128,16 @@ class Moderator
 		puts "You lose! HAHHAHAAA!!"
 		puts "The word was #{board.secret_word}"
 	end	
+
+	def self.to_yaml(turn)
+		YAML.dump ({
+			:board => Board.board,
+			:secret_word => Board.secret_word,
+			:incorrect_guesses => Board.incorrect_guesses,
+			:turn => turn
+		})
+	end
+
 end
 
 Moderator.play_game
