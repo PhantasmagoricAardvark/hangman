@@ -84,12 +84,30 @@ class Board
 	def self.incorrect_guesses
 		@@incorrect_guesses
 	end
+
+	def self.set_secret_word(word)
+		@@secret_word = word
+	end
+
+	def self.set_board(board)
+		@@board = board
+	end
+
+	def self.set_incorrect_guesses(arr)
+		@@incorrect_guesses = arr
+	end
 end
 
 class Player
-	def guess_letter
-		puts "Give me a letter!"
+	def guess_letter(turn)
+		puts "Give me a letter! or save"
 		letter = gets.chomp.downcase
+		if letter == "save"
+			puts "name the file."
+			file_name = gets.chomp.downcase
+			File.open("#{file_name}.yaml", "w") { |file|  
+				file.puts(Moderator.to_yaml(turn))}
+		end
 		until !letter.match(/[a-z]|[A-Z]/).nil? && letter.length == 1
 			puts "Give me a letter!"
 			letter = gets.chomp.downcase
@@ -108,16 +126,8 @@ class Moderator
 		while i > 0
 			puts 
 			puts "Turn #{i}"
-			puts "guess or save? g/s"
-			choice = gets.chomp.downcase
-			if choice == "s"
-				puts "name the file."
-				file_name = gets.chomp.downcase
-				File.open("#{file_name}.yaml", "w") { |file|  
-					file.puts(Moderator.to_yaml(i))}
-			end
 			Board.display_board
-			player.guess_letter
+			player.guess_letter(i)
 			if board.check_victory
 				puts Board.display_board
 				puts "You guessed the word! You win!"
@@ -126,7 +136,7 @@ class Moderator
 			i -= 1
 		end
 		puts "You lose! HAHHAHAAA!!"
-		puts "The word was #{board.secret_word}"
+		puts "The word was #{Board.secret_word}"
 	end	
 
 	def self.to_yaml(turn)
@@ -138,6 +148,24 @@ class Moderator
 		})
 	end
 
+	def self.from_yaml
+		puts "Files to load from: #{Dir.glob("*.yaml").each{|a| a.slice!(-5..-1)}}"
+		file = gets.chomp
+		data = YAML.load(File.open("#{file}.yaml", "r"))
+		Moderator.play_saved_game(data)
+	end	
+
+	def self.play_saved_game(data)
+		p data
+		i = data[:turn]
+		Board.set_secret_word(data[:secret_word])
+		Board.set_board(data[:board])
+		Board.set_incorrect_guesses(data[:incorrect_guesses])
+		p Board.incorrect_guesses
+		p Board.secret_word
+		p Board.board
+
+	end	
 end
 
-Moderator.play_game
+Moderator.from_yaml

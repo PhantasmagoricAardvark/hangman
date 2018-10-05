@@ -1,0 +1,16 @@
+---
+:board:
+- _
+- _
+- _
+- r
+- _
+- _
+- d
+:secret_word: whorled
+:incorrect_guesses:
+- a
+- s
+- f
+- u
+:turn: 6
