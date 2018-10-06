@@ -120,6 +120,9 @@ class Moderator
 	def self.play_game
 		board = Board.new
 		player = Player.new
+		puts "Open saved game? y/n"
+		choice = gets.chomp.downcase
+		Moderator.from_yaml if choice == "y"
 		i = 12
 		board.choose_word
 		board.create_board
@@ -156,16 +159,27 @@ class Moderator
 	end	
 
 	def self.play_saved_game(data)
-		p data
 		i = data[:turn]
 		Board.set_secret_word(data[:secret_word])
 		Board.set_board(data[:board])
 		Board.set_incorrect_guesses(data[:incorrect_guesses])
-		p Board.incorrect_guesses
-		p Board.secret_word
-		p Board.board
-
-	end	
+		board = Board.new
+		player = Player.new
+		while i > 0
+			puts 
+			puts "Turn #{i}"
+			Board.display_board
+			player.guess_letter(i)
+			if board.check_victory
+				puts Board.display_board
+				puts "You guessed the word! You win!"
+				exit
+			end
+			i -= 1
+		end
+		puts "You lose! HAHHAHAAA!!"
+		puts "The word was #{Board.secret_word}"
+	end
 end
 
-Moderator.from_yaml
+Moderator.play_game
